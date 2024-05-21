@@ -1,17 +1,10 @@
 import React from "react";
 import BlogPostCard from "../sub/cards/BlogPostCard";
+import { Blog } from "@/types";
 
 interface blogLayout {
   heading: string;
-  posts: {
-    url: string;
-    postImageSrc: string;
-    title: string;
-    description: string;
-    authorImageSrc: string;
-    authorName: string;
-    authorProfile: string;
-  }[];
+  posts: Blog[];
 }
 
 const BlogsLayout = ({ heading, posts }: blogLayout) => {
@@ -24,7 +17,7 @@ const BlogsLayout = ({ heading, posts }: blogLayout) => {
       )}
       <div className="mt-12 grid md:grid-cols-2 gap-4 grid-cols-1">
         {posts.map((post, index) => (
-          <BlogPostCard key={index} {...post} category="Entertainment" />
+          <BlogPostCard key={index} {...post} />
         ))}
       </div>
     </div>

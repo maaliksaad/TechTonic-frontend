@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, PlusCircleIcon, UploadIcon, Video } from "lucide-react";
+import { createBlog } from "@/lib/actions/blogs.actions";
 
 const formSchema = z.object({
   title: z.string().nonempty({
@@ -46,33 +47,15 @@ const Page = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
 
-  // const slugify = (str) =>
-  //   str
-  //     .toLowerCase()
-  //     .trim()
-  //     .replace(/[^\w\s-]/g, "")
-  //     .replace(/[\s_-]+/g, "-")
-  //     .replace(/^-+|-+$/g, "");
+  const slugify = (str: string) =>
+    str
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
   const handleSubmit = () => {};
-
-  // const handleSubmit = async () => {
-  //   const res = await fetch("/api/posts", {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       title,
-  //       desc: value,
-  //       img: media,
-  //       slug: slugify(title),
-  //       catSlug: catSlug || "style", //If not selected, choose the general category
-  //     }),
-  //   });
-
-  //   if (res.status === 200) {
-  //     const data = await res.json();
-  //     router.push(`/posts/${data.slug}`);
-  //   }
-  // };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,8 +65,18 @@ const Page = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
+    await createBlog({
+      title: data.title,
+      content: value,
+      category: data.category,
+      image: data.image,
+      slug: slugify(data.title),
+      user: "1",
+    });
+
+    router.push("/dashboard");
   };
 
   return (

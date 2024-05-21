@@ -5,8 +5,11 @@ import BlogsLayout from "@/components/main/BlogsLayout";
 import SideBarBlogs from "@/components/main/SideBarBlogs";
 import { popularPosts, recentPosts } from "@/constants";
 import { SearchIcon } from "lucide-react";
+import { fetchBlogs } from "@/lib/actions/blogs.actions";
 
-const Page = () => {
+const Page = async () => {
+  const blogs = await fetchBlogs();
+
   return (
     <>
       <section className="w-full bg-gray-100 py-12 md:py-24 lg:py-32 dark:bg-gray-800 ">
@@ -35,7 +38,7 @@ const Page = () => {
       <div className="relative ">
         <div className="max-w-screen-xl mx-auto py-20 px-10 lg:px-0 lg:py-24">
           <div className="flex flex-col lg:flex-row -mb-10">
-            <BlogsLayout heading="Popular Posts" posts={popularPosts} />
+            <BlogsLayout heading="Popular Posts" posts={blogs} />
             <div className="lg:w-1/3 w-full">
               <SideBarBlogs heading="Recent Posts" Posts={recentPosts} />
             </div>

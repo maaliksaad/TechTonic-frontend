@@ -23,9 +23,9 @@ export async function middleware(req: NextRequest) {
     ];
 
     // Redirect to login if accessing protected paths without a valid token
-    if (protectedPaths.some((p) => path.startsWith(p)) && !token) {
-      return NextResponse.redirect(new URL("/login", req.nextUrl));
-    }
+    // if (protectedPaths.some((p) => path.startsWith(p)) && !token) {
+    //   return NextResponse.redirect(new URL("/login", req.nextUrl));
+    // }
   } catch (error) {
     console.error("Error in authentication middleware:", error);
   }

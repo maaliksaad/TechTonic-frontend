@@ -1,73 +1,35 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import User from "../database/models/user.model";
-import { connectToDatabase } from "../database/mongoose";
-import { CreateUserParams, UpdateUserParams } from "@/types";
+import { CreateUser, LoginUser, User } from "@/types";
 
-// CREATE
-export async function createUser(user: CreateUserParams) {
-  try {
-    await connectToDatabase();
+export async function regiterUser(user: CreateUser): Promise<CreateUser> {
+  const response = await fetch(`${process.env.BACKEND_URI}/api/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
 
-    const newUser = await User.create(user);
-
-    return JSON.parse(JSON.stringify(newUser));
-  } catch (error) {
-    console.log(error);
+  if (!response.ok) {
+    throw new Error("Failed to create user");
   }
+  const createdUser: User = await response.json();
+  return createdUser;
 }
 
-// READ
-export async function getUserById(userId: string) {
-  try {
-    await connectToDatabase();
+export async function loginUser(user: LoginUser): Promise<LoginUser> {
+  const response = await fetch(`${process.env.BACKEND_URI}/api/users/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
 
-    const user = await User.findOne({ _id: userId });
-
-    if (!user) throw new Error("User not found");
-
-    return JSON.parse(JSON.stringify(user));
-  } catch (error) {
-    console.log(error);
+  if (!response.ok) {
+    throw new Error("Failed to login user");
   }
-}
-
-// UPDATE
-export async function updateUser(userId: string, user: UpdateUserParams) {
-  try {
-    await connectToDatabase();
-
-    const updatedUser = await User.findOneAndUpdate({ _id: userId }, user, {
-      new: true,
-    });
-
-    if (!updatedUser) throw new Error("User update failed");
-
-    return JSON.parse(JSON.stringify(updatedUser));
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// DELETE
-export async function deleteUser(userId: string) {
-  try {
-    await connectToDatabase();
-
-    // Find user to delete
-    const userToDelete = await User.findOne({ _id: userId });
-
-    if (!userToDelete) {
-      throw new Error("User not found");
-    }
-
-    // Delete user
-    const deletedUser = await User.findByIdAndDelete(userToDelete._id);
-    revalidatePath("/");
-
-    return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null;
-  } catch (error) {
-    console.log(error);
-  }
+  const User: User = await response.json();
+  return User;
 }
