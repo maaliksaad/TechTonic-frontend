@@ -42,3 +42,17 @@ export async function createBlog(blog: CreateBlog): Promise<CreateBlog> {
   const createdBlog: CreateBlog = await response.json();
   return createdBlog;
 }
+
+export const fetchUserBlogs = async (userId: string): Promise<Blog[]> => {
+  const response = await fetch(
+    `${process.env.BACKEND_URI}/api/blogs/user/${userId}`,
+    {
+      cache: "no-store",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch user blogs");
+  }
+  const blogs: Blog[] = await response.json();
+  return blogs;
+};

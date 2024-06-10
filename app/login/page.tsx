@@ -23,7 +23,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signIn } from "next-auth/react";
-import { loginUser } from "@/lib/actions/user.actions";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -50,17 +49,15 @@ export default function Component() {
     setLoading(true);
     console.log(data);
     try {
-      // const res = await signIn("credentials", {
-      //   email: data.email,
-      //   password: data.password,
-      //   redirect: false,
-      // });
+      const res = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-      // console.log(res);
-      // if (res?.error) {
-      //   console.log(res);
-      // }
-      await loginUser({ email: data.email, password: data.password });
+      if (res?.error) {
+        console.log(res);
+      }
       console.log("User Logged In Successfully!");
       router.push("/dashboard");
     } catch (error) {

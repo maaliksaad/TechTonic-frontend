@@ -1,42 +1,49 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import bycrptjs from "bcryptjs";
-import User from "@/lib/database/models/user.model";
-import { connectToDatabase } from "@/lib/database/mongoose";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
-      credentials: {},
-      async authorize(credentials) {
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
         const { email, password } = credentials as {
           email: string;
           password: string;
         };
+
         try {
-          await connectToDatabase();
-          const user = await User.findOne({ email });
+          const res = await fetch(`${process.env.BACKEND_URI}/api/auth/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!res.ok) {
+            console.error(
+              `Error: Received status ${res.status} from ${process.env.BACKEND_URI}/api/auth/login`
+            );
+            throw new Error("Invalid credentials");
+          }
+
+          const user = await res.json();
+          console.log("Backend response user:", user);
+
           if (!user) {
-            return null;
+            throw new Error("Invalid credentials");
           }
-          const passwordsMatch = await bycrptjs.compare(
-            password,
-            user.password
-          );
-          if (!passwordsMatch) {
-            return null;
-          }
+
           return user;
         } catch (error) {
-          console.log("Error:", error);
+          console.error("Error during authorization:", error);
+          return null;
         }
       },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
 
@@ -45,32 +52,9 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account }: { user: any; account: any }) {
-      if (account.provider === "google") {
-        try {
-          const { name, email } = user;
-          await connectToDatabase();
-          const ifUserExists = await User.findOne({ email });
-          if (ifUserExists) {
-            return user;
-          }
-          const newUser = new User({
-            name: name,
-            email: email,
-          });
-          const res = await newUser.save();
-          if (res.status === 200 || res.status === 201) {
-            console.log(res);
-            return user;
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      }
-      return user;
-    },
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
+        token._id = user._id;
         token.email = user.email;
         token.name = user.name;
       }
@@ -78,15 +62,16 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }: { session: any; token: any }) {
-      if (session.user) {
-        session.user.email = token.email;
-        session.user.name = token.name;
-      }
-
+      session.user = {
+        _id: token._id,
+        email: token.email,
+        name: token.name,
+      };
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET!,
+
+  secret: process.env.NEXTAUTH_SECRET as string,
   pages: {
     signIn: "/login",
   },

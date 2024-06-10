@@ -15,10 +15,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { MoveHorizontalIcon } from "lucide-react";
-import { popularPosts } from "@/constants";
 import Link from "next/link";
+import { Blog } from "@/types";
 
-const BlogPostTable = () => {
+interface BlogPostTableProps {
+  userBlogs: Blog[];
+}
+const BlogPostTable = ({ userBlogs }: BlogPostTableProps) => {
   return (
     <div className="border shadow-sm rounded-lg">
       <Table>
@@ -31,16 +34,16 @@ const BlogPostTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {popularPosts.map((post, index) => (
+          {userBlogs.map((post, index) => (
             <TableRow key={index}>
               <TableCell className="font-medium overflow-hidden">
                 {post.title}
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                {post.authorName}
+                {post.user.name}
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                {post.date}
+                {post.createdAt}
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>

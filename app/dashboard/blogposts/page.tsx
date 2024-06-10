@@ -1,8 +1,15 @@
 import BlogPostTable from "@/components/main/BlogPostTable";
 import { Button } from "@/components/ui/button";
+import { fetchUserBlogs } from "@/lib/actions/blogs.actions";
+import { getSession } from "next-auth/react";
 import React from "react";
 
-const page = () => {
+const page = async () => {
+  const session = await getSession();
+  const userId = session?.user?._id ?? "";
+
+  const userBlogs = await fetchUserBlogs(userId.toString());
+
   return (
     <div>
       <div className="flex items-center mb-3">
@@ -11,7 +18,7 @@ const page = () => {
           New Post
         </Button>
       </div>
-      <BlogPostTable />
+      <BlogPostTable userBlogs={userBlogs} />
     </div>
   );
 };

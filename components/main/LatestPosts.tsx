@@ -1,7 +1,9 @@
 import React from "react";
 import Carousel from "../sub/carousel/BlogsCarousel";
+import { fetchBlogs } from "@/lib/actions/blogs.actions";
 
-const LatestPosts = () => {
+const LatestPosts = async () => {
+  const LatestPosts = await fetchBlogs();
   return (
     <section className="my-20">
       <div className="space-y-2 flex flex-col items-start ml-5 lg:ml-[5.3125rem] mb-4">
@@ -12,7 +14,7 @@ const LatestPosts = () => {
           Check out our latest blog posts.
         </p>
       </div>
-      <Carousel />
+      <Carousel LatestPosts={LatestPosts} />
     </section>
   );
 };

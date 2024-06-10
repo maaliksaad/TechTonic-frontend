@@ -1,3 +1,5 @@
+import NextAuth from "next-auth";
+
 export declare type CreateUserParams = {
   email: string;
   username: string;
@@ -55,4 +57,10 @@ export interface CreateUser {
 export interface LoginUser {
   email: string;
   password: string;
+}
+
+declare module "next-auth" {
+  interface Session {
+    user: User;
+  }
 }

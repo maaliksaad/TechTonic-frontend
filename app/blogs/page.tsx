@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BlogsLayout from "@/components/main/BlogsLayout";
 import SideBarBlogs from "@/components/main/SideBarBlogs";
-import { popularPosts, recentPosts } from "@/constants";
 import { SearchIcon } from "lucide-react";
 import { fetchBlogs } from "@/lib/actions/blogs.actions";
 
@@ -40,7 +39,7 @@ const Page = async () => {
           <div className="flex flex-col lg:flex-row -mb-10">
             <BlogsLayout heading="Popular Posts" posts={blogs} />
             <div className="lg:w-1/3 w-full">
-              <SideBarBlogs heading="Recent Posts" Posts={recentPosts} />
+              <SideBarBlogs heading="Recent Posts" Posts={blogs} />
             </div>
           </div>
         </div>

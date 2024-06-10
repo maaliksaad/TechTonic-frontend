@@ -4,8 +4,13 @@ import { POSTS, popularPosts } from "@/constants";
 import { StepBack, StepForward } from "lucide-react";
 import React, { useState } from "react";
 import BlogPostCard from "../cards/BlogPostCard";
+import { Blog } from "@/types";
 
-const Carousel = () => {
+interface BlogCarousel {
+  LatestPosts: Blog[];
+}
+
+const Carousel = ({ LatestPosts }: BlogCarousel) => {
   const [startIndex, setStartIndex] = useState(0);
 
   const updateIndex = (increment: number) => {
@@ -14,7 +19,7 @@ const Carousel = () => {
       if (newIndex < 0) {
         return POSTS.length - 3;
       } else if (newIndex > POSTS.length - 3) {
-        return 0; // Loop ba
+        return 0;
       } else {
         return newIndex;
       }
@@ -26,7 +31,7 @@ const Carousel = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-        {popularPosts.slice(startIndex, startIndex + 3).map((blog, index) => (
+        {LatestPosts.slice(startIndex, startIndex + 3).map((blog, index) => (
           <div key={index} className="p-4">
             <BlogPostCard {...blog} category="Technology" />
           </div>

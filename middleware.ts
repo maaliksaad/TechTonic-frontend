@@ -5,7 +5,6 @@ export async function middleware(req: NextRequest) {
   try {
     const path = req.nextUrl.pathname;
 
-    // Retrieve token from the request
     const token = await getToken({
       req: req,
       secret: process.env.NEXTAUTH_SECRET,
@@ -22,10 +21,9 @@ export async function middleware(req: NextRequest) {
       "/dashboard/profile",
     ];
 
-    // Redirect to login if accessing protected paths without a valid token
-    // if (protectedPaths.some((p) => path.startsWith(p)) && !token) {
-    //   return NextResponse.redirect(new URL("/login", req.nextUrl));
-    // }
+    if (protectedPaths.some((p) => path.startsWith(p)) && !token) {
+      return NextResponse.redirect(new URL("/login", req.nextUrl));
+    }
   } catch (error) {
     console.error("Error in authentication middleware:", error);
   }

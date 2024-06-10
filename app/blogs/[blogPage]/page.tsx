@@ -3,7 +3,7 @@ import { recentPosts } from "@/constants";
 import Comment from "@/components/sub/comments/Comment";
 import Image from "next/image";
 import NewComment from "@/components/sub/comments/NewComment";
-import { fetchBlog } from "@/lib/actions/blogs.actions";
+import { fetchBlog, fetchBlogs } from "@/lib/actions/blogs.actions";
 
 export default async function Component({
   params,
@@ -11,6 +11,7 @@ export default async function Component({
   params: { blogPage: string };
 }) {
   const blog = await fetchBlog(params.blogPage);
+  const recentBlogs = await fetchBlogs();
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 md:py-12 lg:py-16">
@@ -74,7 +75,7 @@ export default async function Component({
         </article>
 
         <div className="space-y-8">
-          <SideBarBlogs heading="Recent Posts" Posts={recentPosts} />
+          <SideBarBlogs heading="Recent Posts" Posts={recentBlogs} />
         </div>
       </div>
     </div>

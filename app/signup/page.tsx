@@ -10,8 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Changed from "next/navigation"
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { registerUser } from "@/lib/actions/user.actions";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -53,8 +53,8 @@ export default function Component() {
     setLoading(true);
     console.log(data);
     try {
-      const res = await axios.post("/api/register", data);
-      if (res.status === 200 || res.status === 201) {
+      const res = await registerUser(data);
+      if (res) {
         console.log("User added successfully");
         router.push("/login");
       }
