@@ -23,9 +23,12 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-
-        <AuthLinks />
-        <HamburgerNav />
+        <div className="hidden md:block">
+          <AuthLinks />
+        </div>
+        <div className="md:hidden">
+          <HamburgerNav />
+        </div>
       </header>
     </SessionProvider>
   );

@@ -1,26 +1,42 @@
+"use client";
 import BlogPostTable from "@/components/main/BlogPostTable";
 import { Button } from "@/components/ui/button";
 import { fetchUserBlogs } from "@/lib/actions/blogs.actions";
-import { getSession } from "next-auth/react";
-import React from "react";
+import { Blog } from "@/types";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
-const page = async () => {
-  const session = await getSession();
-  const userId = session?.user?._id ?? "";
+const Page = () => {
+  const { data: session } = useSession();
+  const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
 
-  const userBlogs = await fetchUserBlogs(userId.toString());
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      if (session?.user?._id) {
+        try {
+          const blogs = await fetchUserBlogs(session.user._id.toString());
+          setUserBlogs(blogs);
+        } catch (error) {
+          console.error("Error fetching user blogs:", error);
+        }
+      }
+    };
+
+    fetchBlogs();
+  }, [session]);
 
   return (
     <div>
       <div className="flex items-center mb-3">
         <h1 className="font-semibold text-lg md:text-2xl">Blog Posts</h1>
-        <Button className="ml-auto" size="sm">
-          New Post
-        </Button>
+        <Link href="/dashboard/newpost" className="ml-auto">
+          <Button size="sm">New Post</Button>
+        </Link>
       </div>
       <BlogPostTable userBlogs={userBlogs} />
     </div>
   );
 };
 
-export default page;
+export default Page;

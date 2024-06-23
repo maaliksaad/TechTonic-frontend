@@ -44,11 +44,6 @@ export function FeaturedBlogPostCard({
           {title}
         </Link>
         <p className="mb-4 text-gray-500 line-clamp-3">{desc}</p>
-        <Button size="sm" className="m-2 mt-0">
-          <Link href="#" className="text-blue font-medium hover:underline">
-            Read More
-          </Link>
-        </Button>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

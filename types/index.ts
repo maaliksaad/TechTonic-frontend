@@ -43,7 +43,7 @@ export interface CreateBlog {
   content: string;
   category: string;
   slug: string;
-  image: string;
+  image: any;
   user: string;
 }
 
@@ -57,6 +57,15 @@ export interface CreateUser {
 export interface LoginUser {
   email: string;
   password: string;
+}
+
+export interface CommentType {
+  _id: string;
+  content: string;
+  user: User;
+  blog: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 declare module "next-auth" {

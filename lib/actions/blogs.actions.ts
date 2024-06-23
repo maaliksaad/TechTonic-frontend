@@ -27,18 +27,17 @@ export async function fetchBlog(id: string): Promise<Blog> {
   return blog;
 }
 
-export async function createBlog(blog: CreateBlog): Promise<CreateBlog> {
+export async function createBlog(formData: FormData): Promise<CreateBlog> {
+  console.log(formData);
   const response = await fetch(`${process.env.BACKEND_URI}/api/blogs`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(blog),
+    body: formData,
   });
-
+  console.log(response);
   if (!response.ok) {
     throw new Error("Failed to create blog");
   }
+
   const createdBlog: CreateBlog = await response.json();
   return createdBlog;
 }

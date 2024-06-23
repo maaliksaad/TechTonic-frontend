@@ -4,7 +4,7 @@ import { useState } from "react";
 import "react-quill/dist/quill.bubble.css";
 import { useRouter } from "next/navigation";
 import ReactQuill from "react-quill";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -28,20 +28,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, PlusCircleIcon, UploadIcon, Video } from "lucide-react";
 import { createBlog } from "@/lib/actions/blogs.actions";
+import { CreateBlog } from "@/types";
 
+// Define the form schema using Zod
 const formSchema = z.object({
-  title: z.string().nonempty({
-    message: "Title is required.",
-  }),
-  category: z.string({
-    message: "Category is required.",
-  }),
-  image: z.string().nonempty({
-    message: "Image is required.",
-  }),
+  title: z.string().nonempty("Title is required."),
+  content: z.string().nonempty("Content is required."),
+  category: z.string().nonempty("Category is required."),
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => !file || file.size > 0, {
+      message: "Image is required.",
+    }),
 });
 
-const Page = () => {
+// Define the type for form inputs
+type FormData = z.infer<typeof formSchema>;
+
+const Page: React.FC = () => {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
@@ -55,28 +60,34 @@ const Page = () => {
       .replace(/[\s_-]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-  const handleSubmit = () => {};
-
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      image: "",
+      content: "", // Initialize content
+      category: "",
+      image: null as unknown as File, // Initialize image as null
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-    await createBlog({
-      title: data.title,
-      content: value,
-      category: data.category,
-      image: data.image,
-      slug: slugify(data.title),
-      user: "1",
-    });
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    console.log("Form Data:", data); // Debugging: Check form data
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    formData.append("category", data.category);
+    if (data.image) {
+      formData.append("image", data.image);
+    }
+    formData.append("slug", slugify(data.title));
+    formData.append("user", "6649f4e01336f2826243125e"); // Replace with actual user ID
 
-    router.push("/dashboard");
+    try {
+      await createBlog(formData);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error creating blog:", error); // Debugging: Check for errors
+    }
   };
 
   return (
@@ -90,11 +101,11 @@ const Page = () => {
               <FormItem>
                 <FormControl>
                   <Input
-                    id="text"
+                    id="title"
                     placeholder="Title"
                     required
                     type="text"
-                    className="py-12 text-6xl border-none outline-none "
+                    className="py-12 text-6xl border-none outline-none"
                     {...field}
                   />
                 </FormControl>
@@ -131,67 +142,82 @@ const Page = () => {
               </FormItem>
             )}
           />
-
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ReactQuill
+                    className="w-full mt-10"
+                    theme="bubble"
+                    value={field.value}
+                    onChange={(content) => field.onChange(content)}
+                    placeholder="Tell your story..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="flex gap-5 h-[43.75rem] relative">
             <Button variant="ghost" onClick={() => setOpen(!open)}>
               <PlusCircleIcon size={24} color="black" />
             </Button>
-            {open && (
-              <div className=" flex gap-5 absolute z-50 w-full left-14">
-                <FormField
-                  control={form.control}
-                  name="image"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        <Button
-                          variant="ghost"
-                          className="rounded-full border-2 border-black"
-                        >
-                          <ImageIcon />
-                        </Button>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          id="image"
-                          type="file"
-                          className="relative -top-12 opacity-0 w-14 h-10 cursor-pointer"
-                          accept="image/*"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                <Button
-                  variant="ghost"
-                  className="rounded-full border-2 border-black"
-                >
-                  <UploadIcon />
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="rounded-full border-2 border-black"
-                >
-                  <Video />
-                </Button>
-              </div>
-            )}
-            <ReactQuill
-              className="w-full mt-10"
-              theme="bubble"
-              value={value}
-              onChange={setValue}
-              placeholder="Tell your story..."
-            />
+            <div className="flex gap-5 absolute z-50 w-full left-14">
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <Button
+                        variant="ghost"
+                        className="rounded-full border-2 border-black"
+                      >
+                        <ImageIcon />
+                      </Button>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        id="image"
+                        type="file"
+                        className="relative -top-12 opacity-0 w-14 h-10 cursor-pointer"
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            console.log("File selected:", e.target.files[0]); // Debugging: Check file
+                            field.onChange(e.target.files[0]);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                variant="ghost"
+                className="rounded-full border-2 border-black"
+              >
+                <UploadIcon />
+              </Button>
+              <Button
+                variant="ghost"
+                className="rounded-full border-2 border-black"
+              >
+                <Video />
+              </Button>
+            </div>
           </div>
-
           <Button variant="default" className="mr-4" type="submit">
             Publish
           </Button>
-          <Button variant="destructive" onClick={handleSubmit}>
+          <Button
+            variant="destructive"
+            onClick={() => router.push("/dashboard")}
+          >
             Cancel
           </Button>
         </form>

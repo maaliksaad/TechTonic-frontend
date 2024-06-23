@@ -1,16 +1,25 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import BlogPostTable from "@/components/main/BlogPostTable";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { getSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { fetchUserBlogs } from "@/lib/actions/blogs.actions";
+import { useEffect, useState } from "react";
+import { Blog } from "@/types";
 
-export default async function Page() {
-  const session = await getSession();
+export default function Page() {
+  const { data: session } = useSession();
   const userId = session?.user?._id;
+  const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
 
-  console.log("user ID::::", userId);
-  // const userBlogs = (await fetchUserBlogs(userId.toString())).slice(0, 5);
+  useEffect(() => {
+    if (userId) {
+      fetchUserBlogs(userId.toString())
+        .then((blogs) => setUserBlogs(blogs.slice(0, 5)))
+        .catch((error) => console.error("Error fetching user blogs:", error));
+    }
+  }, [userId]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -31,7 +40,12 @@ export default async function Page() {
           <Link href="/dashboard/blogposts">Show All</Link>
         </Button>
       </div>
-      {/* <BlogPostTable userBlogs={userBlogs} /> */}
+
+      {userBlogs.length > 0 ? (
+        <BlogPostTable userBlogs={userBlogs} />
+      ) : (
+        <p className="text-gray-600">No recent posts found.</p>
+      )}
     </div>
   );
 }

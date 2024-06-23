@@ -1,49 +1,92 @@
-import React from "react";
-import {
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenu,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { MenuIcon } from "lucide-react";
-import { NavItems } from "@/constants";
-import AuthLinks from "./AuthLinks";
+import { useState } from "react";
+import { NavItems, authMenuItems } from "@/constants";
 import Link from "next/link";
+import { useSession, signOut, signIn } from "next-auth/react";
+import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
-const HamburgerNav = () => {
+const HamburgerNav: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <nav className="md:hidden flex h-14 lg:h-[60px] items-center gap-4  px-6 dark:bg-gray-800/40">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            className="rounded-full  w-10 h-10 dark:border-gray-800"
-            size="icon"
-            variant="ghost"
-          >
-            <MenuIcon className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {NavItems.map((navitem, index) => (
-            <Link
-              key={index}
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-              href={navitem.href}
+    <>
+      <button
+        onClick={toggleMenu}
+        className="text-gray-600 dark:text-gray-400 focus:outline-none"
+      >
+        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </button>
+      {isOpen && (
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "tween" }}
+          className="fixed inset-0 z-50 flex flex-col bg-white shadow-md dark:bg-gray-950"
+        >
+          <div className="flex justify-between items-center p-4">
+            <span className="text-lg font-semibold">TechTonic</span>
+            <button
+              onClick={toggleMenu}
+              className="text-gray-600 dark:text-gray-400 focus:outline-none"
             >
-              <DropdownMenuLabel>{navitem.name}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-            </Link>
-          ))}
-          <DropdownMenuLabel>
-            <AuthLinks />
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </nav>
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          <nav className="flex flex-col items-start gap-4 p-4">
+            {NavItems.map((navitem, index) => (
+              <Link
+                key={index}
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href={navitem.href}
+                onClick={toggleMenu}
+              >
+                {navitem.name}
+              </Link>
+            ))}
+            {session ? (
+              <>
+                <h1 className="font-bold text-black pt-4 ">My Account</h1>
+                {authMenuItems.map((navitem, index) => (
+                  <Link
+                    key={index}
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                    href={navitem.href}
+                    onClick={toggleMenu}
+                  >
+                    {navitem.name}
+                  </Link>
+                ))}
+                <button
+                  onClick={() => {
+                    signOut();
+                    toggleMenu();
+                  }}
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  signIn();
+                  toggleMenu();
+                }}
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              >
+                Sign In
+              </button>
+            )}
+          </nav>
+        </motion.div>
+      )}
+    </>
   );
 };
 
