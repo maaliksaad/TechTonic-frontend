@@ -9,7 +9,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const { email, password } = credentials as {
           email: string;
           password: string;
@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
           const user = await res.json();
           console.log("Backend response user:", user);
 
-          if (!user) {
+          if (!user || !user.token) {
             throw new Error("Invalid credentials");
           }
 
@@ -57,6 +57,8 @@ export const authOptions: NextAuthOptions = {
         token._id = user._id;
         token.email = user.email;
         token.name = user.name;
+        token.image = user.image;
+        token.token = user.token; // <-- include token from backend
       }
       return token;
     },
@@ -66,6 +68,8 @@ export const authOptions: NextAuthOptions = {
         _id: token._id,
         email: token.email,
         name: token.name,
+        image: token.image,
+        token: token.token, // <-- make token available in session
       };
       return session;
     },

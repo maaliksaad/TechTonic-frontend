@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "react-quill/dist/quill.bubble.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ReactQuill from "react-quill";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
@@ -27,8 +27,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, PlusCircleIcon, UploadIcon, Video } from "lucide-react";
-import { createBlog } from "@/lib/actions/blogs.actions";
-import { CreateBlog } from "@/types";
+import { createBlog, getBlogById } from "@/lib/actions/blogs.actions";
+import { useSession } from "next-auth/react";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -48,6 +48,7 @@ type FormData = z.infer<typeof formSchema>;
 
 const Page: React.FC = () => {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
@@ -71,22 +72,24 @@ const Page: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    console.log("Form Data:", data); // Debugging: Check form data
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("content", data.content);
     formData.append("category", data.category);
+    formData.append("slug", slugify(data.title));
     if (data.image) {
       formData.append("image", data.image);
     }
-    formData.append("slug", slugify(data.title));
-    formData.append("user", "6649f4e01336f2826243125e"); // Replace with actual user ID
-
+    console.log("Form data being submitted:", formData); // Debugging: Check form data
     try {
-      await createBlog(formData);
-      router.push("/dashboard");
+      if (session?.user?.token) {
+        await createBlog(formData, session.user.token);
+        router.push("/dashboard");
+      } else {
+        console.error("User token is not available.");
+      }
     } catch (error) {
-      console.error("Error creating blog:", error); // Debugging: Check for errors
+      console.error("Error creating blog:", error);
     }
   };
 

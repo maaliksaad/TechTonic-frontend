@@ -10,16 +10,21 @@ import { Blog } from "@/types";
 
 export default function Page() {
   const { data: session } = useSession();
-  const userId = session?.user?._id;
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
-    if (userId) {
-      fetchUserBlogs(userId.toString())
-        .then((blogs) => setUserBlogs(blogs.slice(0, 5)))
-        .catch((error) => console.error("Error fetching user blogs:", error));
-    }
-  }, [userId]);
+    const fetchBlogs = async () => {
+      if (session?.user?.token) {
+        try {
+          const blogs = await fetchUserBlogs(session.user.token);
+          setUserBlogs(blogs);
+        } catch (error) {
+          console.error("Error fetching user blogs:", error);
+        }
+      }
+    };
+    fetchBlogs();
+  }, [session]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -42,7 +47,7 @@ export default function Page() {
       </div>
 
       {userBlogs.length > 0 ? (
-        <BlogPostTable userBlogs={userBlogs} />
+        <BlogPostTable userBlogs={userBlogs} setUserBlogs={setUserBlogs} />
       ) : (
         <p className="text-gray-600">No recent posts found.</p>
       )}

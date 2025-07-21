@@ -23,6 +23,7 @@ export interface User {
   image: string;
   createdAt: string;
   updatedAt: string;
+  token?: string; // <-- add this line
 }
 
 // Blog Interface

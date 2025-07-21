@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "next-auth/react";
 
 const formSchema = z.object({
   comment: z.string().min(1, {
@@ -30,6 +31,7 @@ const NewComment = () => {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     console.log(data);
+
     form.reset();
   };
 

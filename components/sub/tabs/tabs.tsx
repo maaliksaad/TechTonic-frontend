@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Link from "next/link";
-import { POSTS } from "@/constants";
+import {
+  BUSINESS_POSTS,
+  DESIGN_POSTS,
+  LIFESTYLE_POSTS,
+  POSTS,
+  TECH_POSTS,
+  TRENDING_POSTS,
+} from "@/constants";
 import FeaturedBlogPostCard from "../cards/FeaturedBlogPostCard";
 import { Button } from "@/components/ui/button";
 
@@ -38,9 +45,9 @@ export default function Tab() {
       value: "frontend",
       content: (
         <div className="container grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {POSTS.map(({ img, tag, title, desc, date, author }) => (
+          {TECH_POSTS.map(({ img, tag, title, desc, date, author }, index) => (
             <FeaturedBlogPostCard
-              key={title}
+              key={index}
               img={img}
               tag={tag}
               title={title}
@@ -60,20 +67,22 @@ export default function Tab() {
       value: "backend",
       content: (
         <div className="container grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {POSTS.map(({ img, tag, title, desc, date, author }) => (
-            <FeaturedBlogPostCard
-              key={title}
-              img={img}
-              tag={tag}
-              title={title}
-              desc={desc}
-              date={date}
-              author={{
-                img: author.img,
-                name: author.name,
-              }}
-            />
-          ))}
+          {TRENDING_POSTS.map(
+            ({ img, tag, title, desc, date, author }, index) => (
+              <FeaturedBlogPostCard
+                key={index}
+                img={img}
+                tag={tag}
+                title={title}
+                desc={desc}
+                date={date}
+                author={{
+                  img: author.img,
+                  name: author.name,
+                }}
+              />
+            )
+          )}
         </div>
       ),
     },
@@ -82,20 +91,22 @@ export default function Tab() {
       value: "cloud",
       content: (
         <div className="container grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {POSTS.map(({ img, tag, title, desc, date, author }) => (
-            <FeaturedBlogPostCard
-              key={title}
-              img={img}
-              tag={tag}
-              title={title}
-              desc={desc}
-              date={date}
-              author={{
-                img: author.img,
-                name: author.name,
-              }}
-            />
-          ))}
+          {LIFESTYLE_POSTS.map(
+            ({ img, tag, title, desc, date, author }, index) => (
+              <FeaturedBlogPostCard
+                key={index}
+                img={img}
+                tag={tag}
+                title={title}
+                desc={desc}
+                date={date}
+                author={{
+                  img: author.img,
+                  name: author.name,
+                }}
+              />
+            )
+          )}
         </div>
       ),
     },
@@ -104,20 +115,22 @@ export default function Tab() {
       value: "ai",
       content: (
         <div className="container grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {POSTS.map(({ img, tag, title, desc, date, author }) => (
-            <FeaturedBlogPostCard
-              key={title}
-              img={img}
-              tag={tag}
-              title={title}
-              desc={desc}
-              date={date}
-              author={{
-                img: author.img,
-                name: author.name,
-              }}
-            />
-          ))}
+          {BUSINESS_POSTS.map(
+            ({ img, tag, title, desc, date, author }, index) => (
+              <FeaturedBlogPostCard
+                key={index}
+                img={img}
+                tag={tag}
+                title={title}
+                desc={desc}
+                date={date}
+                author={{
+                  img: author.img,
+                  name: author.name,
+                }}
+              />
+            )
+          )}
         </div>
       ),
     },
@@ -126,20 +139,22 @@ export default function Tab() {
       value: "tools",
       content: (
         <div className="container grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {POSTS.map(({ img, tag, title, desc, date, author }) => (
-            <FeaturedBlogPostCard
-              key={title}
-              img={img}
-              tag={tag}
-              title={title}
-              desc={desc}
-              date={date}
-              author={{
-                img: author.img,
-                name: author.name,
-              }}
-            />
-          ))}
+          {DESIGN_POSTS.map(
+            ({ img, tag, title, desc, date, author }, index) => (
+              <FeaturedBlogPostCard
+                key={index}
+                img={img}
+                tag={tag}
+                title={title}
+                desc={desc}
+                date={date}
+                author={{
+                  img: author.img,
+                  name: author.name,
+                }}
+              />
+            )
+          )}
         </div>
       ),
     },

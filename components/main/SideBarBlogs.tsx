@@ -9,7 +9,7 @@ interface Post {
 
 const SideBarBlogs = ({ heading, Posts }: Post) => {
   return (
-    <div className="mt-24 lg:mt-0 lg:w-full">
+    <div className="mt-24 lg:mt-0 lg:w-full text-left">
       {heading && (
         <h2 className="text-4xl sm:text-5xl font-black tracking-wide text-left lg:text-4xl xl:text-5xl">
           {heading}
@@ -18,7 +18,7 @@ const SideBarBlogs = ({ heading, Posts }: Post) => {
       <div className="flex flex-wrap lg:flex-col mt-12 flex-col sm:flex-row  sm:justify-between lg:justify-start">
         {Posts.slice(0, 8).map((post, index) => (
           <Link
-            className=" flex justify-between mb-10 max-w-none w-full sm:w-1/2 lg:w-auto sm:odd:pr-12 lg:odd:pr-0 mr-0  sm:max-w-sm cursor-pointer last:mb-0 sm:mb-0 sm:odd:mr-8 lg:mr-8 xl:mr-16"
+            className=" flex  mb-10 max-w-none w-full sm:w-1/2 lg:w-auto sm:odd:pr-12 lg:odd:pr-0 mr-0  sm:max-w-sm cursor-pointer last:mb-0 sm:mb-0 sm:odd:mr-8 lg:mr-8 xl:mr-16"
             key={index}
             href={`/blogs/${post._id}`}
           >

@@ -17,11 +17,41 @@ import { Button } from "@/components/ui/button";
 import { MoveHorizontalIcon } from "lucide-react";
 import Link from "next/link";
 import { Blog } from "@/types";
+import { useSession } from "next-auth/react";
+import { deleteBlog } from "@/lib/actions/blogs.actions";
+import { useRouter } from "next/navigation";
 
 interface BlogPostTableProps {
   userBlogs: Blog[];
+  setUserBlogs: React.Dispatch<React.SetStateAction<Blog[]>>; // 🔹 To update state after delete
 }
-const BlogPostTable = ({ userBlogs }: BlogPostTableProps) => {
+
+const BlogPostTable = ({ userBlogs, setUserBlogs }: BlogPostTableProps) => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleDelete = async (blogId: string) => {
+    if (!session?.user?.token) {
+      console.error("User is not authenticated");
+      return;
+    }
+
+    console.log("Deleting blog with ID:", blogId);
+
+    try {
+      const deletedBlog = await deleteBlog(blogId, session.user.token);
+      console.log("Deleted blog:", deletedBlog);
+
+      // 🔹 Update UI to remove deleted blog
+      setUserBlogs((prev) => prev.filter((b) => b._id !== blogId));
+    } catch (error) {
+      console.error("Delete error in catch:", error);
+    }
+  };
+
+  const handleEdit = (blog: Blog) => {
+    router.push(`dashboard/newpost?edit=1&id=${blog._id}`);
+  };
   return (
     <div className="border shadow-sm rounded-lg">
       <Table>
@@ -54,11 +84,13 @@ const BlogPostTable = ({ userBlogs }: BlogPostTableProps) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Link href="#">Edit</Link>
+                    <DropdownMenuItem onClick={() => handleEdit(post)}>
+                      Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="#">Delete</Link>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(post._id)} // 🔹 Delete called here
+                    >
+                      Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

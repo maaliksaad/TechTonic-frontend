@@ -16,8 +16,11 @@ export async function registerUser(user: CreateUser): Promise<CreateUser> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create user");
+    const errorData = await response.json().catch(() => ({}));
+    console.error("Register API Error:", errorData);
+    throw new Error(errorData.message || "Failed to create user");
   }
+
   const createdUser: User = await response.json();
   return createdUser;
 }

@@ -13,16 +13,15 @@ const Page = () => {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      if (session?.user?._id) {
+      if (session?.user?.token) {
         try {
-          const blogs = await fetchUserBlogs(session.user._id.toString());
+          const blogs = await fetchUserBlogs(session.user.token);
           setUserBlogs(blogs);
         } catch (error) {
           console.error("Error fetching user blogs:", error);
         }
       }
     };
-
     fetchBlogs();
   }, [session]);
 
